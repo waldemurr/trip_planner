@@ -79,7 +79,7 @@ class RoutingService:
             props = feature["properties"]["summary"]
             coords = [[pt[1], pt[0]] for pt in geometry["coordinates"]]
             return {
-                "distance_miles": props["distance"] / 1609.34,
+                "distance_miles": props["distance"],
                 "duration_hours": props["duration"] / 3600,
                 "geometry": coords,
             }
@@ -107,7 +107,9 @@ class RoutingService:
 
         data = response.json()
         if data.get("code") != "Ok" or not data.get("routes"):
-            raise RuntimeError(f"OSRM could not find a route: {data.get('message', 'unknown')}")
+            raise RuntimeError(
+                f"OSRM could not find a route: {data.get('message', 'unknown')}"
+            )
 
         route = data["routes"][0]
         return {

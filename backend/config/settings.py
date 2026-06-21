@@ -44,9 +44,11 @@ ROOT_URLCONF = "config.urls"
 
 _CORS_ORIGINS = os.getenv(
     "CORS_ALLOWED_ORIGINS",
-    "http://localhost:3000,http://localhost:5173,http://127.0.0.1:5173,http://localhost:8000",
+    "http://localhost:3000,http://localhost:5173,http://localhost:5174,http://127.0.0.1:5173,http://127.0.0.1:5174,http://localhost:8000",
 )
-CORS_ALLOWED_ORIGINS = [origin.strip() for origin in _CORS_ORIGINS.split(",") if origin.strip()]
+CORS_ALLOWED_ORIGINS = [
+    origin.strip() for origin in _CORS_ORIGINS.split(",") if origin.strip()
+]
 if not CORS_ALLOWED_ORIGINS:
     CORS_ALLOW_ALL_ORIGINS = True
 
@@ -68,12 +70,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+if os.getenv("DATABASE_URL"):
+    # e.g. postgres://user:password@host:5432/dbname
+    import dj_database_url
+
+    DATABASES = {"default": dj_database_url.config(conn_max_age=600)}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
     }
-}
 
 AUTH_PASSWORD_VALIDATORS = [
     {

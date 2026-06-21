@@ -2,8 +2,8 @@ export type LogStatus = "off" | "sleeper" | "driving" | "on";
 
 export interface LogSegment {
     status: LogStatus;
-    start_time: string;  // "08:30:00"
-    end_time: string;    // "17:00:00"
+    start_time: string; // "08:30:00"
+    end_time: string; // "17:00:00"
 }
 
 export interface DailyLog {
@@ -15,9 +15,11 @@ export interface DailyLog {
     segments: LogSegment[];
 }
 
+export type StopType = "start" | "pickup" | "dropoff" | "fuel" | "rest";
+
 export interface Stop {
     id: number;
-    stop_type: "pickup" | "dropoff" | "fuel" | "rest";
+    stop_type: StopType;
     address: string;
     latitude: number;
     longitude: number;
@@ -27,6 +29,9 @@ export interface Stop {
 export interface Trip {
     id: number;
     current_cycle_used_hours: number;
+    total_distance_miles: number;
+    total_duration_hours: number;
+    route_geometry: [number, number][];
     created_at: string;
     stops: Stop[];
     daily_logs: DailyLog[];
@@ -37,4 +42,8 @@ export interface TripCreateRequest {
     pickup_location: string;
     dropoff_location: string;
     current_cycle_used_hours: number;
+}
+
+export interface ApiError {
+    error: string;
 }

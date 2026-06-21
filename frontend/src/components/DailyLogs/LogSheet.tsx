@@ -1,4 +1,3 @@
-import React from "react";
 import type { DailyLog } from "../../types";
 import { generateLogSheetSVG } from "../../utils/logGenerator";
 
@@ -11,15 +10,24 @@ export const LogSheet: React.FC<LogSheetProps> = ({ log }) => {
 
     return (
         <div className="log-sheet">
-            <h4>Date: {log.date}</h4>
-            <div className="log-grid">
-                <div dangerouslySetInnerHTML={{ __html: svgContent }} />
-            </div>
+            <h4>FMCSA Log Sheet — {log.date}</h4>
+            <div
+                className="log-grid"
+                dangerouslySetInnerHTML={{ __html: svgContent }}
+            />
             <div className="log-summary">
-                <span>Driving: {log.driving_hours}h</span>
-                <span>On Duty: {log.on_duty_hours}h</span>
-                <span>Off Duty: {log.off_duty_hours}h</span>
-                <span>Sleeper: {log.sleeper_hours}h</span>
+                <span className="summary-driving">
+                    D: {log.driving_hours.toFixed(1)}h
+                </span>
+                <span className="summary-on">
+                    ON: {log.on_duty_hours.toFixed(1)}h
+                </span>
+                <span className="summary-off">
+                    OFF: {log.off_duty_hours.toFixed(1)}h
+                </span>
+                <span className="summary-sleeper">
+                    SLEEP: {log.sleeper_hours.toFixed(1)}h
+                </span>
             </div>
         </div>
     );

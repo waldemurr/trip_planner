@@ -28,7 +28,9 @@ class GeocodingService:
                 timeout=getattr(settings, "ORS_TIMEOUT", 15),
             )
         except requests.exceptions.Timeout as exc:
-            raise ConnectionError(f"Geocoding service timed out for address: {address}") from exc
+            raise ConnectionError(
+                f"Geocoding service timed out for address: {address}"
+            ) from exc
         except requests.exceptions.RequestException as exc:
             raise ConnectionError(f"Geocoding service unavailable: {exc}") from exc
 

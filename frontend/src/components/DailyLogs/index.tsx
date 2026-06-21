@@ -1,4 +1,3 @@
-import React from "react";
 import type { DailyLog } from "../../types";
 import { LogSheet } from "./LogSheet";
 

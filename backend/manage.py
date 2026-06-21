@@ -3,10 +3,20 @@
 
 import os
 import sys
+from pathlib import Path
 
 
 def main():
     """Run administrative tasks."""
+    # Make both the project root and the backend package importable so that
+    # ``config.settings`` and ``backend.apps.*`` resolve correctly regardless of
+    # where the command is invoked from.
+    backend_dir = Path(__file__).resolve().parent
+    project_root = backend_dir.parent
+    for path in (str(backend_dir), str(project_root)):
+        if path not in sys.path:
+            sys.path.insert(0, path)
+
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
     try:
         from django.core.management import execute_from_command_line

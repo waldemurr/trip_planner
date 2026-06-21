@@ -30,7 +30,6 @@ export default defineConfig([
       // Optionally, add this for stylistic rules
       tseslint.configs.stylisticTypeChecked,
 
-      // Other configs...
     ],
     languageOptions: {
       parserOptions: {

@@ -1,54 +1,87 @@
 import type { DailyLog, LogSegment } from "../types";
+import { parseTime } from "./timeHelpers";
+
+const SVG_WIDTH = 1000;
+const SVG_HEIGHT = 420;
+const MARGIN = { top: 50, right: 20, bottom: 50, left: 110 };
+const GRID_WIDTH = SVG_WIDTH - MARGIN.left - MARGIN.right;
+const GRID_HEIGHT = SVG_HEIGHT - MARGIN.top - MARGIN.bottom;
+const ROW_HEIGHT = GRID_HEIGHT / 4;
+const HOUR_WIDTH = GRID_WIDTH / 24;
+
+const STATUS_COLORS: Record<string, string> = {
+    off: "#e0e0e0",
+    sleeper: "#4CAF50",
+    driving: "#2196F3",
+    on: "#FF9800",
+};
+
+const STATUS_ROWS: Record<string, number> = {
+    off: 0,
+    sleeper: 1,
+    driving: 2,
+    on: 3,
+};
+
+const ROW_LABELS = ["OFF DUTY", "SLEEPER", "DRIVING", "ON DUTY"];
 
 export const generateLogSheetSVG = (log: DailyLog): string => {
-    const width = 800;
-    const height = 400;
-    const cellWidth = width / 24;
-    const cellHeight = height / 4;
+    const segments = log.segments || [];
 
-    const statusColors: Record<string, string> = {
-        OFF: "#e0e0e0", 
-        D: "#2196F3",
-        ON: "#FF9800",
-        R: "#4CAF50", 
-    };
-    let svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">`;
-    for (let i = 0; i <= 24; i++) {
-        svg += `<line x1="${i * cellWidth}" y1="0" x2="${i * cellWidth}" y2="${height}" stroke="#ccc" stroke-width="0.5"/>`;
-    }
+    let svg = `<svg viewBox="0 0 ${SVG_WIDTH} ${SVG_HEIGHT}" xmlns="http://www.w3.org/2000/svg" class="eld-svg">`;
+
+    svg += `<text x="${SVG_WIDTH / 2}" y="28" text-anchor="middle" font-size="18" font-weight="600" fill="#333">FMCSA Driver's Daily Log — ${log.date}</text>`;
+    svg += `<rect x="${MARGIN.left}" y="${MARGIN.top}" width="${GRID_WIDTH}" height="${GRID_HEIGHT}" fill="#fff" stroke="#333" stroke-width="2"/>`;
+
     for (let i = 0; i <= 4; i++) {
-        svg += `<line x1="0" y1="${i * cellHeight}" x2="${width}" y2="${i * cellHeight}" stroke="#ccc" stroke-width="0.5"/>`;
+        const y = MARGIN.top + i * ROW_HEIGHT;
+        const strokeWidth = i === 0 || i === 4 ? 2 : 1;
+        svg += `<line x1="${MARGIN.left}" y1="${y}" x2="${MARGIN.left + GRID_WIDTH}" y2="${y}" stroke="#333" stroke-width="${strokeWidth}"/>`;
+
+        if (i < 4) {
+            svg += `<text x="${MARGIN.left - 10}" y="${y + ROW_HEIGHT / 2 + 5}" text-anchor="end" font-size="13" font-weight="600" fill="#333">${ROW_LABELS[i]}</text>`;
+        }
     }
-    const statusRowMap: Record<string, number> = {
-        OFF: 0,
-        D: 1,
-        ON: 2,
-        R: 3,
-    };
-    log.segments.forEach((segment) => {
-        const startHour = new Date(segment.start_time).getHours();
-        const endHour = new Date(segment.end_time).getHours();
-        const duration = endHour - startHour;
 
-        const row = statusRowMap[segment.status] || 0;
-        const x = startHour * cellWidth;
-        const y = row * cellHeight;
-        const w = duration * cellWidth;
-        const h = cellHeight;
+    for (let h = 0; h <= 24; h++) {
+        const x = MARGIN.left + h * HOUR_WIDTH;
+        const isMajor = h % 2 === 0;
+        const stroke = isMajor ? "#555" : "#ccc";
+        const width = isMajor ? 1.5 : 0.5;
+        svg += `<line x1="${x}" y1="${MARGIN.top}" x2="${x}" y2="${MARGIN.top + GRID_HEIGHT}" stroke="${stroke}" stroke-width="${width}"/>`;
 
-        svg += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${statusColors[segment.status] || "#fff"}" stroke="#333" stroke-width="1"/>`;
-        svg += `<text x="${x + 4}" y="${y + 20}" font-size="10" fill="#000">${segment.status}</text>`;
+        if (isMajor) {
+            svg += `<text x="${x}" y="${MARGIN.top + GRID_HEIGHT + 22}" text-anchor="middle" font-size="12" fill="#333">${h}</text>`;
+        }
+
+        if (h < 24) {
+            for (let q = 1; q <= 3; q++) {
+                const tx = x + (q * HOUR_WIDTH) / 4;
+                svg += `<line x1="${tx}" y1="${MARGIN.top + GRID_HEIGHT - 6}" x2="${tx}" y2="${MARGIN.top + GRID_HEIGHT}" stroke="#999" stroke-width="0.5"/>`;
+            }
+        }
+    }
+
+    segments.forEach((segment: LogSegment) => {
+        const start = parseTime(segment.start_time);
+        const end = parseTime(segment.end_time);
+        let duration = end - start;
+        if (duration <= 0) duration += 24;
+
+        const row = STATUS_ROWS[segment.status] ?? 0;
+        const x = MARGIN.left + start * HOUR_WIDTH;
+        const y = MARGIN.top + row * ROW_HEIGHT;
+        const width = duration * HOUR_WIDTH;
+        const color = STATUS_COLORS[segment.status] || "#ccc";
+
+        svg += `<rect x="${x}" y="${y}" width="${Math.max(width, 1)}" height="${ROW_HEIGHT}" fill="${color}" stroke="#222" stroke-width="0.5"/>`;
     });
-    const rowLabels = ["OFF", "D", "ON", "R"];
-    rowLabels.forEach((label, i) => {
-        svg += `<text x="5" y="${i * cellHeight + 20}" font-size="12" font-weight="bold" fill="#333">${label}</text>`;
-    });
 
-    for (let i = 0; i <= 24; i++) {
-        svg += `<text x="${i * cellWidth - 8}" y="${height - 5}" font-size="8" fill="#666">${i}</text>`;
+    for (let h = 0; h <= 24; h += 2) {
+        const x = MARGIN.left + h * HOUR_WIDTH;
+        svg += `<text x="${x}" y="${MARGIN.top - 10}" text-anchor="middle" font-size="12" fill="#333">${String(h).padStart(2, "0")}:00</text>`;
     }
 
     svg += "</svg>";
-
     return svg;
 };

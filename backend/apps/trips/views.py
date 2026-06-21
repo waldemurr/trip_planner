@@ -23,7 +23,9 @@ class CreateTripAPIView(APIView):
         except ConnectionError as exc:
             logger.warning("External routing service error: %s", exc)
             return Response(
-                {"error": "Routing/geocoding service is unavailable. Please try again later."},
+                {
+                    "error": "Routing/geocoding service is unavailable. Please try again later."
+                },
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
         except RuntimeError as exc:
@@ -32,7 +34,9 @@ class CreateTripAPIView(APIView):
         except Exception as exc:  # noqa: BLE001
             logger.exception("Unexpected error while creating trip")
             return Response(
-                {"error": "Unable to plan the trip. Please check the addresses and try again."},
+                {
+                    "error": "Unable to plan the trip. Please check the addresses and try again."
+                },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
         return Response(TripSerializer(trip).data)
@@ -41,7 +45,11 @@ class CreateTripAPIView(APIView):
 class TripAPIView(APIView):
     def get(self, request, pk):
         try:
-            trip = Trip.objects.prefetch_related("stops", "daily_logs", "daily_logs__segments").get(pk=pk)
+            trip = Trip.objects.prefetch_related(
+                "stops", "daily_logs", "daily_logs__segments"
+            ).get(pk=pk)
         except Trip.DoesNotExist:
-            return Response({"error": "Trip not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Trip not found"}, status=status.HTTP_404_NOT_FOUND
+            )
         return Response(TripSerializer(trip).data)
