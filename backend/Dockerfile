@@ -2,13 +2,13 @@ FROM python:3.12
 
 WORKDIR /app
 
-COPY backend/requirements.txt ./backend/requirements.txt
+COPY requirements.txt ./requirements.txt
 RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r backend/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-WORKDIR /app/backend
+WORKDIR /app/
 
 # Collect static files
 RUN python manage.py collectstatic --noinput
