@@ -173,7 +173,7 @@ export const LocationInput: React.FC<LocationInputProps> = ({
                 />
                 {isLoading && (
                     <span className="location-spinner">
-                        <FaSpinner className="spinner-icon" />
+                        <span style={{ display: "inline-block", animation: "spin 1s linear infinite" }}><FaSpinner /></span>
                     </span>
                 )}
             </div>

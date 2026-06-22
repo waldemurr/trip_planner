@@ -11,7 +11,7 @@ SECRET_KEY = os.getenv(
     "django-insecure-zkcglbm2d!mj3udae$m(8f^j(j939i)slb3g-fub^1lam=zz_v",
 )
 
-DEBUG = os.getenv("DEBUG", "True") == "True"
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
@@ -103,7 +103,12 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 ORS_API_KEY = os.getenv("ORS_API_KEY", "")
 ORS_TIMEOUT = int(os.getenv("ORS_TIMEOUT", "15"))
