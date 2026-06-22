@@ -42,6 +42,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "config.urls"
 
+# CORS configuration
 _CORS_ORIGINS = os.getenv(
     "CORS_ALLOWED_ORIGINS",
     "http://localhost:3000,http://localhost:5173,http://localhost:5174,http://127.0.0.1:5173,http://127.0.0.1:5174,http://localhost:8000",
@@ -49,10 +50,13 @@ _CORS_ORIGINS = os.getenv(
 CORS_ALLOWED_ORIGINS = [
     origin.strip() for origin in _CORS_ORIGINS.split(",") if origin.strip()
 ]
+
+# If no origins are configured, allow all (for development only)
 if not CORS_ALLOWED_ORIGINS:
     CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOW_CREDENTIALS = True
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
