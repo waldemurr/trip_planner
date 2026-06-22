@@ -16,5 +16,6 @@ openpyxl==3.1.5
 xlsxwriter==3.2.0
 gunicorn==22.0.0
 whitenoise==6.7.0
+asgiref>=3.7
 
 black==26.5.1
