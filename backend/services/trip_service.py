@@ -136,7 +136,9 @@ class TripService:
         # Overnight rest stops at the end of each driving day, except the last.
         cumulative_distance = 0.0
         for day in hos_days[:-1]:
-            day_distance = cls._day_distance_miles(day, trip.total_distance_miles, trip.total_duration_hours)
+            day_distance = cls._day_distance_miles(
+                day, trip.total_distance_miles, trip.total_duration_hours
+            )
             cumulative_distance += day_distance
             if cumulative_distance >= trip.total_distance_miles:
                 break
@@ -176,7 +178,9 @@ class TripService:
             )
 
     @classmethod
-    def _day_distance_miles(cls, day: Dict, total_distance: float, total_duration: float) -> float:
+    def _day_distance_miles(
+        cls, day: Dict, total_distance: float, total_duration: float
+    ) -> float:
         if total_duration <= 0:
             return 0
         return day["driving_hours"] / total_duration * total_distance
