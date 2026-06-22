@@ -11,9 +11,12 @@ import os
 import sys
 from pathlib import Path
 
-backend_dir = Path(__file__).resolve().parent
-project_root = backend_dir.parent
-for path in (str(backend_dir), str(project_root)):
+# In Docker: __file__ = /app/backend/config/wsgi.py
+# We need /app in sys.path so Python can find the 'backend' package.
+backend_dir = Path(__file__).resolve().parent      # /app/backend/config
+project_root = backend_dir.parent                   # /app/backend
+app_root = project_root.parent                      # /app
+for path in (str(backend_dir), str(project_root), str(app_root)):
     if path not in sys.path:
         sys.path.insert(0, path)
 
