@@ -43,14 +43,14 @@ MIDDLEWARE = [
 ROOT_URLCONF = "config.urls"
 
 # CORS configuration
-CORS_HARDCODE = [
+CORS_HARDCODE = ",".join([
     "http://localhost:5173",
     "http://localhost:5174",
     "http://127.0.0.1:5173",
     "http://127.0.0.1:5174",
     "http://localhost:8000",
     "https://trip-planner-57h1xyhhy-walder.vercel.app",
-]
+])
 
 _CORS_ORIGINS = os.getenv(
     "CORS_ALLOWED_ORIGINS",
